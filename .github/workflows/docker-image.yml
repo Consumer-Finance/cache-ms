@@ -30,7 +30,7 @@ jobs:
     # 4. Construir la imagen de Docker
     - name: Build Docker image
       run: |
-        docker build -f Dockerfile.prod -t ${{ vars.ECR_REPOSITORY_URI }}:latest .
+        docker build -f Dockerfile -t ${{ vars.ECR_REPOSITORY_URI }}:latest .
 
     # 5. Subir la imagen a ECR
     - name: Push Docker image to Amazon ECR
