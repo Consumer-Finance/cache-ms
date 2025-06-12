@@ -15,8 +15,8 @@ services:
       - ./coverage-e2e:/usr/src/app/coverage-e2e
     environment:
       - NODE_ENV=test
-      - NATS_SERVERS=${NATS_SERVERS}
-      - REDIS_URL=${REDIS_URL}
+      - NATS_SERVERS=nats://nats
+      - REDIS_URL=redis://redis
 
   nats:
     image: nats:alpine
