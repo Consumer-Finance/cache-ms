@@ -5,20 +5,20 @@ describe('envs.ts', () => {
     let originalEnv: NodeJS.ProcessEnv;
 
     beforeAll(() => {
-        originalEnv = process.env;
+        originalEnv = { ...process.env };
         envsSchema = joi.object({
-            PORT: joi.number().required(),
             NATS_SERVERS: joi.array().items(joi.string()).required(),
+            REDIS_URL: joi.string().required()
         }).unknown(true);
     });
 
     afterEach(() => {
-        process.env = originalEnv;
+        process.env = { ...originalEnv };
     });
 
     it('should validate environment variables successfully', () => {
-        process.env.PORT = '3000';
         process.env.NATS_SERVERS = 'nats://localhost:4222,nats://localhost:4223';
+        process.env.REDIS_URL = 'redis://localhost:6379';
 
         const { error, value } = envsSchema.validate({
             ...process.env,
@@ -26,16 +26,13 @@ describe('envs.ts', () => {
         });
 
         expect(error).toBeUndefined();
-        expect(value).toEqual({
-            ...process.env,
-            PORT: 3000,
-            NATS_SERVERS: ['nats://localhost:4222', 'nats://localhost:4223']
-        });
+        expect(value.NATS_SERVERS).toEqual(['nats://localhost:4222', 'nats://localhost:4223']);
+        expect(value.REDIS_URL).toBe('redis://localhost:6379');
     });
 
-    it('should throw an error if environment variables are invalid', () => {
-        process.env.PORT = 'invalid_port';
-        process.env.NATS_SERVERS = 'nats://localhost:4222,nats://localhost:4223';
+    it('should throw an error if REDIS_URL is missing', () => {
+        process.env.NATS_SERVERS = 'nats://localhost:4222';
+        delete process.env.REDIS_URL;
 
         const { error } = envsSchema.validate({
             ...process.env,
@@ -43,19 +40,30 @@ describe('envs.ts', () => {
         });
 
         expect(error).toBeDefined();
-        expect(error?.message).toContain('"PORT" must be a number');
+        expect(error?.message).toContain('"REDIS_URL" is required');
     });
 
-    it('should throw an error if required environment variables are missing', () => {
-        process.env.PORT = '3000';
-        delete process.env.NATS_SERVERS;
+    it('should throw an error if NATS_SERVERS is missing', () => {
+        const testEnv = { 
+            REDIS_URL: 'redis://localhost:6379'
+        };
 
-        const { error } = envsSchema.validate({
-            ...process.env,
-            NATS_SERVERS: process.env.NATS_SERVERS?.split(',')
-        });
+        const { error } = envsSchema.validate(testEnv);
 
         expect(error).toBeDefined();
         expect(error?.message).toContain('"NATS_SERVERS" is required');
+    });
+
+    it('should handle single NATS server', () => {
+        process.env.NATS_SERVERS = 'nats://localhost:4222';
+        process.env.REDIS_URL = 'redis://localhost:6379';
+
+        const { error, value } = envsSchema.validate({
+            ...process.env,
+            NATS_SERVERS: process.env.NATS_SERVERS?.split(',')
+        });
+
+        expect(error).toBeUndefined();
+        expect(value.NATS_SERVERS).toEqual(['nats://localhost:4222']);
     });
 });
