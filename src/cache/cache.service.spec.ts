@@ -87,6 +87,26 @@ describe('CacheService', () => {
 
       expect(cacheManager.set).toHaveBeenCalledWith(key, value, undefined);
     });
+
+    it('should delete key when setting undefined value', async () => {
+      const key = 'test-key';
+      cacheManager.del.mockResolvedValue(true);
+
+      await service.set(key, undefined);
+
+      expect(cacheManager.del).toHaveBeenCalledWith(key);
+      expect(cacheManager.set).not.toHaveBeenCalled();
+    });
+
+    it('should delete key when setting null value', async () => {
+      const key = 'test-key';
+      cacheManager.del.mockResolvedValue(true);
+
+      await service.set(key, null);
+
+      expect(cacheManager.del).toHaveBeenCalledWith(key);
+      expect(cacheManager.set).not.toHaveBeenCalled();
+    });
   });
 
   describe('del', () => {

@@ -1,0 +1,27 @@
+services:
+  cache-ms:
+    container_name: cache-ms
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    image: cache-ms:0.0.1
+    command: npm run test:e2e:watch
+    depends_on:
+      - nats
+      - redis
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./test:/usr/src/app/test
+      - ./coverage-e2e:/usr/src/app/coverage-e2e
+    environment:
+      - NODE_ENV=test
+      - NATS_SERVERS=${NATS_SERVERS}
+      - REDIS_URL=${REDIS_URL}
+
+  nats:
+    image: nats:alpine
+    container_name: nats
+      
+  redis:
+    image: redis:7-alpine
+    container_name: redis
