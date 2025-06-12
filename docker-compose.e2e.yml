@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile.test
     image: cache-ms:0.0.1
-    command: npm run test:e2e:watch
+    command: npm run test:e2e
     depends_on:
       - nats
       - redis

@@ -6,5 +6,18 @@
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
-  "coverageDirectory": "coverage-e2e"
+  "coverageDirectory": "coverage-e2e",
+  "testTimeout": 30000,
+  "collectCoverageFrom": [
+    "src/**/*.(t|j)s"
+  ],
+  "coveragePathIgnorePatterns": [
+    "node_modules",
+    "test",
+    "dist",
+    ".spec.ts",
+    ".e2e-spec.ts"
+  ],
+  "forceExit": true,
+  "detectOpenHandles": true
 }

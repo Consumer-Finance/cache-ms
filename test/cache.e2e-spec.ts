@@ -75,7 +75,7 @@ describe('Cache E2E', () => {
     it('should set value with TTL', async () => {
       const key = 'test-ttl-key';
       const value = 'test-ttl-value';
-      const ttl = 1; // 1 second
+      const ttl = 1000    // 1 second
 
       // Set value with TTL
       await firstValueFrom(client.send('set_cache', { key, value, ttl }));
