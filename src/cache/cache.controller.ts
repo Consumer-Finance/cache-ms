@@ -4,8 +4,7 @@ import { MessagePattern } from '@nestjs/microservices';
 
 @Controller()
 export class CacheController {
-
-  constructor(private readonly cacheService: CacheService) { }
+  constructor(private readonly cacheService: CacheService) {}
 
   @MessagePattern('get_cache')
   async get(key: string) {

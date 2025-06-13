@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
+import {
+  ClientProxy,
+  ClientProxyFactory,
+  Transport,
+} from '@nestjs/microservices';
 import { AppModule } from '../src/app.module';
 import { INestMicroservice } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
@@ -12,10 +16,7 @@ describe('Cache E2E', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        AppModule,
-        NastModule
-      ]
+      imports: [AppModule, NastModule],
     }).compile();
 
     app = module.createNestMicroservice({
@@ -29,7 +30,7 @@ describe('Cache E2E', () => {
 
     client = ClientProxyFactory.create({
       transport: Transport.NATS,
-      options: { servers: envs.nats_servers }
+      options: { servers: envs.nats_servers },
     });
     await app.listen();
   });
@@ -39,7 +40,7 @@ describe('Cache E2E', () => {
     await app.close();
 
     // Ensure all connections are closed
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
   });
 
   beforeEach(async () => {
@@ -75,17 +76,19 @@ describe('Cache E2E', () => {
     it('should set value with TTL', async () => {
       const key = 'test-ttl-key';
       const value = 'test-ttl-value';
-      const ttl = 1000    // 1 second
+      const ttl = 1000; // 1 second
 
       // Set value with TTL
       await firstValueFrom(client.send('set_cache', { key, value, ttl }));
 
       // Get value immediately
-      const immediateResult = await firstValueFrom(client.send('get_cache', key));
+      const immediateResult = await firstValueFrom(
+        client.send('get_cache', key),
+      );
       expect(immediateResult).toBe(value);
 
       // Wait for TTL to expire
-      await new Promise(resolve => setTimeout(resolve, 1100));
+      await new Promise((resolve) => setTimeout(resolve, 1100));
 
       // Get value after TTL
       const expiredResult = await firstValueFrom(client.send('get_cache', key));
@@ -114,7 +117,9 @@ describe('Cache E2E', () => {
     it('should handle non-existent keys gracefully', async () => {
       const nonExistentKey = 'non-existent-key-12345';
 
-      const result = await firstValueFrom(client.send('get_cache', nonExistentKey));
+      const result = await firstValueFrom(
+        client.send('get_cache', nonExistentKey),
+      );
       expect(result).toBeNull();
     });
 
@@ -124,7 +129,9 @@ describe('Cache E2E', () => {
 
       // Set multiple values
       for (let i = 0; i < keys.length; i++) {
-        await firstValueFrom(client.send('set_cache', { key: keys[i], value: values[i] }));
+        await firstValueFrom(
+          client.send('set_cache', { key: keys[i], value: values[i] }),
+        );
       }
 
       // Verify all values exist
@@ -151,10 +158,12 @@ describe('Cache E2E', () => {
       // Create multiple concurrent set operations
       for (let i = 0; i < 10; i++) {
         operations.push(
-          firstValueFrom(client.send('set_cache', {
-            key: `${baseKey}${i}`,
-            value: `${baseValue}${i}`
-          }))
+          firstValueFrom(
+            client.send('set_cache', {
+              key: `${baseKey}${i}`,
+              value: `${baseValue}${i}`,
+            }),
+          ),
         );
       }
 
@@ -163,7 +172,9 @@ describe('Cache E2E', () => {
 
       // Verify all values were set correctly
       for (let i = 0; i < 10; i++) {
-        const result = await firstValueFrom(client.send('get_cache', `${baseKey}${i}`));
+        const result = await firstValueFrom(
+          client.send('get_cache', `${baseKey}${i}`),
+        );
         expect(result).toBe(`${baseValue}${i}`);
       }
     });
@@ -172,20 +183,25 @@ describe('Cache E2E', () => {
       const key = 'large-data-key';
       const largeValue = {
         data: 'x'.repeat(10000), // 10KB string
-        array: Array.from({ length: 1000 }, (_, i) => ({ id: i, value: `item-${i}` })),
+        array: Array.from({ length: 1000 }, (_, i) => ({
+          id: i,
+          value: `item-${i}`,
+        })),
         metadata: {
           created: new Date().toISOString(),
           size: 'large',
           nested: {
             deep: {
-              value: 'very deep'
-            }
-          }
-        }
+              value: 'very deep',
+            },
+          },
+        },
       };
 
       // Set large value
-      await firstValueFrom(client.send('set_cache', { key, value: largeValue }));
+      await firstValueFrom(
+        client.send('set_cache', { key, value: largeValue }),
+      );
 
       // Get large value
       const result = await firstValueFrom(client.send('get_cache', key));
@@ -200,11 +216,13 @@ describe('Cache E2E', () => {
         text: 'Special chars: àáâãäåæçèéêëìíîïñòóôõöùúûüý',
         symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?',
         unicode: '🚀🎉💻🔥⭐',
-        json: '{"nested": "value", "array": [1, 2, 3]}'
+        json: '{"nested": "value", "array": [1, 2, 3]}',
       };
 
       // Set value with special characters
-      await firstValueFrom(client.send('set_cache', { key: specialKey, value: specialValue }));
+      await firstValueFrom(
+        client.send('set_cache', { key: specialKey, value: specialValue }),
+      );
 
       // Get value with special characters
       const result = await firstValueFrom(client.send('get_cache', specialKey));
@@ -219,7 +237,7 @@ describe('Cache E2E', () => {
 
       // This should not throw an error, but behavior depends on implementation
       await expect(
-        firstValueFrom(client.send('set_cache', { key: emptyKey, value }))
+        firstValueFrom(client.send('set_cache', { key: emptyKey, value })),
       ).resolves.not.toThrow();
     });
 
@@ -227,7 +245,9 @@ describe('Cache E2E', () => {
       const key = 'null-value-key';
 
       // First set a real value
-      await firstValueFrom(client.send('set_cache', { key, value: 'real-value' }));
+      await firstValueFrom(
+        client.send('set_cache', { key, value: 'real-value' }),
+      );
       const realValue = await firstValueFrom(client.send('get_cache', key));
       expect(realValue).toBe('real-value');
 
@@ -237,13 +257,17 @@ describe('Cache E2E', () => {
       expect(nullResult).toBeNull();
 
       // Set a value again
-      await firstValueFrom(client.send('set_cache', { key, value: 'another-value' }));
+      await firstValueFrom(
+        client.send('set_cache', { key, value: 'another-value' }),
+      );
       const anotherValue = await firstValueFrom(client.send('get_cache', key));
       expect(anotherValue).toBe('another-value');
 
       // Set undefined value should also delete the key
       await firstValueFrom(client.send('set_cache', { key, value: undefined }));
-      const undefinedResult = await firstValueFrom(client.send('get_cache', key));
+      const undefinedResult = await firstValueFrom(
+        client.send('get_cache', key),
+      );
       expect(undefinedResult).toBeNull();
     });
   });

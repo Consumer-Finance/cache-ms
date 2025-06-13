@@ -5,7 +5,6 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { envs } from './common/config';
 
 export async function bootstrap() {
-
   const logger = new Logger('Cache-Main');
 
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -13,9 +12,10 @@ export async function bootstrap() {
     {
       transport: Transport.NATS,
       options: {
-        servers: envs.nats_servers
-      }
-    });
+        servers: envs.nats_servers,
+      },
+    },
+  );
 
   app.enableShutdownHooks();
 

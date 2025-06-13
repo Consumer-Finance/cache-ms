@@ -1,15 +1,15 @@
-import { Module } from '@nestjs/common';
+import 'reflect-metadata';
 
 jest.mock('./common/cache/redis.module', () => ({
-  RedisModule: class MockRedisModule {}
+  RedisModule: class MockRedisModule {},
 }));
 
 jest.mock('./common/transports/nast.module', () => ({
-  NastModule: class MockNastModule {}
+  NastModule: class MockNastModule {},
 }));
 
 jest.mock('./cache/cache.module', () => ({
-  CacheModule: class MockCacheModule {}
+  CacheModule: class MockCacheModule {},
 }));
 
 describe('AppModule', () => {
@@ -32,7 +32,7 @@ describe('AppModule', () => {
     const { RedisModule } = await import('./common/cache/redis.module');
     const { NastModule } = await import('./common/transports/nast.module');
     const { CacheModule } = await import('./cache/cache.module');
-    
+
     const moduleMetadata = Reflect.getMetadata('imports', AppModule);
     expect(moduleMetadata).toContain(RedisModule);
     expect(moduleMetadata).toContain(NastModule);

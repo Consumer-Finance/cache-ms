@@ -1,0 +1,22 @@
+services:
+  cache-ms:
+    container_name: cache-ms
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    command: npm run test:e2e
+    depends_on:
+      - nats
+      - redis
+    environment:
+      - NODE_ENV=test
+      - NATS_SERVERS=nats://nats
+      - REDIS_URL=redis://redis
+  
+  nats:
+    image: nats:alpine
+    container_name: nats
+        
+  redis:
+    image: redis:7-alpine
+    container_name: redis

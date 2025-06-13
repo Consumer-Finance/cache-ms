@@ -1,15 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger } from '@nestjs/common';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { Transport } from '@nestjs/microservices';
 
 jest.mock('@nestjs/core');
 jest.mock('./app.module', () => ({
-  AppModule: class MockAppModule {}
+  AppModule: class MockAppModule {},
 }));
 jest.mock('./common/config', () => ({
   envs: {
-    nats_servers: ['nats://localhost:4222']
-  }
+    nats_servers: ['nats://localhost:4222'],
+  },
 }));
 
 describe('Main Bootstrap', () => {
@@ -37,23 +37,20 @@ describe('Main Bootstrap', () => {
   it('should create microservice with correct configuration', async () => {
     const { bootstrap } = await import('./main');
     const { AppModule } = await import('./app.module');
-    
+
     await bootstrap();
 
-    expect(mockCreateMicroservice).toHaveBeenCalledWith(
-      AppModule,
-      {
-        transport: Transport.NATS,
-        options: {
-          servers: ['nats://localhost:4222']
-        }
-      }
-    );
+    expect(mockCreateMicroservice).toHaveBeenCalledWith(AppModule, {
+      transport: Transport.NATS,
+      options: {
+        servers: ['nats://localhost:4222'],
+      },
+    });
   });
 
   it('should enable shutdown hooks', async () => {
     const { bootstrap } = await import('./main');
-    
+
     await bootstrap();
 
     expect(mockApp.enableShutdownHooks).toHaveBeenCalled();
@@ -61,7 +58,7 @@ describe('Main Bootstrap', () => {
 
   it('should start listening', async () => {
     const { bootstrap } = await import('./main');
-    
+
     await bootstrap();
 
     expect(mockApp.listen).toHaveBeenCalled();
@@ -69,7 +66,7 @@ describe('Main Bootstrap', () => {
 
   it('should log startup message', async () => {
     const { bootstrap } = await import('./main');
-    
+
     await bootstrap();
 
     expect(loggerSpy).toHaveBeenCalledWith('Cache Microservice is running');

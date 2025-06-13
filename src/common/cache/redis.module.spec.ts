@@ -4,8 +4,8 @@ import { envs } from '../config/envs';
 jest.mock('@keyv/redis');
 jest.mock('../config/envs', () => ({
   envs: {
-    redis_url: 'redis://localhost:6379'
-  }
+    redis_url: 'redis://localhost:6379',
+  },
 }));
 
 describe('RedisModule Configuration', () => {
@@ -24,7 +24,7 @@ describe('RedisModule Configuration', () => {
 
   it('should create keyv instance with redis url', () => {
     const keyv = createKeyv(envs.redis_url);
-    
+
     expect(createKeyv).toHaveBeenCalledWith('redis://localhost:6379');
     expect(keyv).toBe(mockKeyv);
   });
@@ -33,10 +33,10 @@ describe('RedisModule Configuration', () => {
     const keyv = createKeyv(envs.redis_url);
     const connectHandler = jest.fn();
     const errorHandler = jest.fn();
-    
+
     keyv.on('connect', connectHandler);
     keyv.on('error', errorHandler);
-    
+
     expect(mockKeyv.on).toHaveBeenCalledWith('connect', connectHandler);
     expect(mockKeyv.on).toHaveBeenCalledWith('error', errorHandler);
   });

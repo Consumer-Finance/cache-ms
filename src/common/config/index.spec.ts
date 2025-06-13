@@ -23,7 +23,7 @@ describe('Config Index', () => {
   it('should re-export all expected modules', async () => {
     const indexExports = await import('./index');
     const exports = Object.keys(indexExports);
-    
+
     expect(exports).toContain('envs');
     expect(exports).toContain('NAST_SERVICE');
   });

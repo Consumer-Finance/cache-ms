@@ -1,0 +1,34 @@
+# Develop dependencies
+FROM node:22.16-alpine AS dependencies
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install
+
+# Build and Tests
+FROM node:22.16-alpine AS builder
+WORKDIR /usr/src/app
+
+# Copy deps, node_modules
+COPY --from=dependencies /usr/src/app/node_modules  ./node_modules
+
+# Copy source code
+COPY . .
+RUN npm run test
+RUN npm run build
+
+# Production dependencies
+FROM node:22.16-alpine AS prod-dependencies
+WORKDIR /usr/src/app
+COPY package*.json ./
+COPY --from=dependencies /usr/src/app/package-lock.json ./
+RUN npm ci -f --omit=dev && npm cache clean --force
+
+# Runner
+FROM node:22.16-alpine AS runner
+WORKDIR /usr/src/app
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=prod-dependencies /usr/src/app/node_modules  ./node_modules
+COPY . .
+ENV NODE_ENV=production
+USER node
+CMD [ "node","dist/main.js" ]

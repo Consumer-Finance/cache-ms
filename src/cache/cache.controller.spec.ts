@@ -25,7 +25,9 @@ describe('CacheController', () => {
     }).compile();
 
     controller = module.get<CacheController>(CacheController);
-    cacheService = module.get<CacheService>(CacheService) as jest.Mocked<CacheService>;
+    cacheService = module.get<CacheService>(
+      CacheService,
+    ) as jest.Mocked<CacheService>;
   });
 
   it('should be defined', () => {
@@ -62,7 +64,11 @@ describe('CacheController', () => {
 
       await controller.set(data);
 
-      expect(cacheService.set).toHaveBeenCalledWith(data.key, data.value, undefined);
+      expect(cacheService.set).toHaveBeenCalledWith(
+        data.key,
+        data.value,
+        undefined,
+      );
     });
 
     it('should call cacheService.set with key, value, and TTL', async () => {
@@ -71,20 +77,28 @@ describe('CacheController', () => {
 
       await controller.set(data);
 
-      expect(cacheService.set).toHaveBeenCalledWith(data.key, data.value, data.ttl);
+      expect(cacheService.set).toHaveBeenCalledWith(
+        data.key,
+        data.value,
+        data.ttl,
+      );
     });
 
     it('should handle complex objects as values', async () => {
-      const data = { 
-        key: 'test-key', 
-        value: { data: 'test', nested: { prop: 123 } }, 
-        ttl: 1800 
+      const data = {
+        key: 'test-key',
+        value: { data: 'test', nested: { prop: 123 } },
+        ttl: 1800,
       };
       cacheService.set.mockResolvedValue(undefined);
 
       await controller.set(data);
 
-      expect(cacheService.set).toHaveBeenCalledWith(data.key, data.value, data.ttl);
+      expect(cacheService.set).toHaveBeenCalledWith(
+        data.key,
+        data.value,
+        data.ttl,
+      );
     });
   });
 

@@ -1,13 +1,13 @@
 jest.mock('./cache.service', () => ({
-  CacheService: class MockCacheService {}
+  CacheService: class MockCacheService {},
 }));
 
 jest.mock('./cache.controller', () => ({
-  CacheController: class MockCacheController {}
+  CacheController: class MockCacheController {},
 }));
 
 jest.mock('../common/transports/nast.module', () => ({
-  NastModule: class MockNastModule {}
+  NastModule: class MockNastModule {},
 }));
 
 describe('CacheModule', () => {
@@ -22,11 +22,11 @@ describe('CacheModule', () => {
     const { CacheController } = await import('./cache.controller');
     const { CacheService } = await import('./cache.service');
     const { NastModule } = await import('../common/transports/nast.module');
-    
+
     const controllers = Reflect.getMetadata('controllers', CacheModule);
     const providers = Reflect.getMetadata('providers', CacheModule);
     const imports = Reflect.getMetadata('imports', CacheModule);
-    
+
     expect(controllers).toContain(CacheController);
     expect(providers).toContain(CacheService);
     expect(imports).toContain(NastModule);
@@ -35,7 +35,7 @@ describe('CacheModule', () => {
   it('should export CacheController and CacheService classes', async () => {
     const { CacheController } = await import('./cache.controller');
     const { CacheService } = await import('./cache.service');
-    
+
     expect(typeof CacheController).toBe('function');
     expect(typeof CacheService).toBe('function');
   });

@@ -6,8 +6,6 @@ import { NastModule } from '../common/transports/nast.module';
 @Module({
   controllers: [CacheController],
   providers: [CacheService],
-  imports: [
-    NastModule
-  ]
+  imports: [NastModule],
 })
-export class CacheModule { }
+export class CacheModule {}

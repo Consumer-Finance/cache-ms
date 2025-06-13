@@ -1,13 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { NastModule } from './nast.module';
 import { NAST_SERVICE } from '../config/services';
 
 jest.mock('../config', () => ({
   NAST_SERVICE: 'NAST_SERVICE',
   envs: {
-    nats_servers: ['nats://localhost:4222', 'nats://localhost:4223']
-  }
+    nats_servers: ['nats://localhost:4222', 'nats://localhost:4223'],
+  },
 }));
 
 describe('NastModule', () => {
